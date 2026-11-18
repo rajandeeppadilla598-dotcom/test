@@ -3,7 +3,7 @@ local fs = require("filesystem")
 
 for _, name in ipairs({"gpu", "stargate"}) do
   if not component.isAvailable(name) then
-    io.stderr:write("Missing component: " .. name .. "\n")
+    io.stderr:write("Компонент не найден: " .. name .. "\n")
     return
   end
 end
@@ -19,5 +19,5 @@ end)
 package.path = originalPath
 
 if not ok then
-  io.stderr:write("Stargate Control: " .. tostring(reason) .. "\n")
+  io.stderr:write("Управление вратами: " .. tostring(reason) .. "\n")
 end

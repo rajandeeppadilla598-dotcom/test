@@ -1,5 +1,7 @@
 local component = require("component")
+local unicode = require("unicode")
 local classes = require("src/classes")
+local palette = require("src/palette")
 
 local gpu = component.gpu
 local AddressField = classes.class()
@@ -22,15 +24,15 @@ function AddressField:draw()
   if self.draft then
     text = text .. "_"
   elseif text == "" then
-    text = "ENTER ADDRESS"
+    text = "ВВЕДИТЕ АДРЕС"
   end
 
-  gpu.setBackground(self.bg)
+  gpu.setBackground(self.draft and palette.CYAN or self.bg)
   gpu.fill(self.x, self.y, self.w, self.h, " ")
   gpu.setBackground(self.textBg)
   gpu.fill(self.x + 1, self.y + 1, self.w - 2, self.h - 2, " ")
-  gpu.setForeground(self.fg)
-  gpu.set(self.x + math.floor((self.w - #text) / 2),
+  gpu.setForeground(address == "" and not self.draft and palette.GREY_LIGHT or self.fg)
+  gpu.set(self.x + math.floor((self.w - unicode.len(text)) / 2),
     self.y + math.floor(self.h / 2), text)
 end
 

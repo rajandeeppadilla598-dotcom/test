@@ -1,618 +1,185 @@
+local unicode = require("unicode")
+local palette = require("src/palette")
+local gpu = require("component").gpu
 local graphics = {}
 
-local component = require("component")
-local palette = require("src/palette")
-
-local gpu = component.gpu
-
-function graphics.draw()
-  local w, h = gpu.getResolution()
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.fill(1, 1, w, h, " ")
-  graphics.drawBorders(w, h)
-  gpu.setBackground(palette.CYAN)
-  gpu.setForeground(palette.TEXT_WHITE)
-  gpu.set(4, 1, "STARGATE CONTROL")
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.setForeground(palette.CYAN_LIGHT)
-  gpu.set(44, 2, "GATE STATUS")
-  gpu.set(129, 6, "CHEVRONS")
-  graphics.drawGate()
-  graphics.drawGateControls()
-  graphics.drawStatusWindow()
-end
-
-function graphics.drawBorders(w, h)
-  gpu.setBackground(palette.CYAN)
-  gpu.fill(1, 1, w, 1, " ")
-  gpu.fill(1, 2, 1, h - 2, " ")
-  gpu.fill(1, h, w, 1, " ")
-  gpu.fill(w, 2, 1, h - 2, " ")
-end
-
-function graphics.drawGate()
-  --outer ring
-  gpu.setBackground(palette.CYAN_LIGHT)
-  gpu.fill(74, 8, 14, 1, " ")
-  gpu.fill(88, 9, 6, 1, " ")
-  gpu.fill(94, 10, 4, 1, " ")
-  gpu.fill(98, 11, 2, 1, " ")
-  gpu.fill(100, 12, 2, 1, " ")
-  gpu.fill(102, 13, 2, 1, " ")
-  gpu.fill(104, 14, 2, 1, " ")
-  gpu.fill(106, 15, 2, 2, " ")
-  gpu.fill(108, 17, 2, 3, " ")
-  
-  gpu.fill(110, 20, 2, 7, " ")
-  gpu.fill(108, 27, 2, 3, " ")
-  gpu.fill(106, 30, 2, 2, " ")
-  gpu.fill(104, 32, 2, 1, " ")
-  gpu.fill(102, 33, 2, 1, " ")
-  gpu.fill(100, 34, 2, 1, " ")
-  gpu.fill(98, 35, 2, 1, " ")
-  gpu.fill(94, 36, 4, 1, " ")
-  gpu.fill(88, 37, 6, 1, " ")
-
-  gpu.fill(74, 38, 14, 1, " ")
-  gpu.fill(68, 37, 6, 1, " ")
-  gpu.fill(64, 36, 4, 1, " ")
-  gpu.fill(62, 35, 2, 1, " ")
-  gpu.fill(60, 34, 2, 1, " ")
-  gpu.fill(58, 33, 2, 1, " ")
-  gpu.fill(56, 32, 2, 1, " ")
-  gpu.fill(54, 30, 2, 2, " ")
-  gpu.fill(52, 27, 2, 3, " ")
-
-  gpu.fill(50, 20, 2, 7, " ")
-  gpu.fill(52, 17, 2, 3, " ")
-  gpu.fill(54, 15, 2, 2, " ")
-  gpu.fill(56, 14, 2, 1, " ")
-  gpu.fill(58, 13, 2, 1, " ")
-  gpu.fill(60, 12, 2, 1, " ")
-  gpu.fill(62, 11, 2, 1, " ")
-  gpu.fill(64, 10, 4, 1, " ")
-  gpu.fill(68, 9, 6, 1, " ")
-  
-  --inner ring
-  gpu.fill(74, 11, 14, 1, " ")
-  gpu.fill(88, 12, 4, 1, " ")
-  gpu.fill(92, 13, 4, 1, " ")
-  gpu.fill(96, 14, 2, 1, " ")
-  gpu.fill(98, 15, 2, 1, " ")
-  gpu.fill(100, 16, 2, 2, " ")
-  gpu.fill(102, 18, 2, 2, " ")
-
-  gpu.fill(104, 20, 2, 7, " ")
-  gpu.fill(102, 27, 2, 2, " ")
-  gpu.fill(100, 29, 2, 2, " ")
-  gpu.fill(98, 31, 2, 1, " ")
-  gpu.fill(96, 32, 2, 1, " ")
-  gpu.fill(92, 33, 4, 1, " ")
-  gpu.fill(88, 34, 4, 1, " ")
-
-  gpu.fill(74, 35, 14, 1, " ")
-  gpu.fill(70, 34, 4, 1, " ")
-  gpu.fill(66, 33, 4, 1, " ")
-  gpu.fill(64, 32, 2, 1, " ")
-  gpu.fill(62, 31, 2, 1, " ")
-  gpu.fill(60, 29, 2, 2, " ")
-  gpu.fill(58, 27, 2, 2, " ")
-
-  gpu.fill(56, 20, 2, 7, " ")
-  gpu.fill(58, 18, 2, 2, " ")
-  gpu.fill(60, 16, 2, 2, " ")
-  gpu.fill(62, 15, 2, 1, " ")
-  gpu.fill(64, 14, 2, 1, " ")
-  gpu.fill(66, 13, 4, 1, " ")
-  gpu.fill(70, 12, 4, 1, " ")
-  
-  --middle ring
-  gpu.setBackground(palette.SLATE_LIGHT)
-  gpu.fill(84, 9, 2, 2, " ")
-  gpu.fill(88, 10, 2, 2, " ")
-  gpu.fill(92, 11, 2, 2, " ")
-  gpu.fill(96, 12, 2, 1, " ")
-  gpu.fill(98, 14, 2, 1, " ")
-  gpu.fill(102, 15, 2, 1, " ")
-  gpu.fill(102, 17, 4, 1, " ")
-  gpu.fill(104, 19, 4, 1, " ")
-  gpu.fill(106, 21, 4, 1, " ")
-  
-  gpu.fill(106, 25, 4, 1, " ")
-  gpu.fill(104, 27, 4, 1, " ")
-  gpu.fill(102, 29, 4, 1, " ")
-  gpu.fill(102, 31, 2, 1, " ")
-  gpu.fill(98, 32, 2, 1, " ")
-  gpu.fill(100, 33, 2, 1, " ")
-  gpu.fill(96, 34, 2, 1, " ")
-  gpu.fill(92, 34, 2, 2, " ")
-  gpu.fill(88, 35, 2, 2, " ")
-  gpu.fill(84, 36, 2, 2, " ")
-
-  gpu.fill(80, 36, 2, 2, " ")
-  gpu.fill(76, 36, 2, 2, " ")
-  gpu.fill(72, 35, 2, 2, " ")
-  gpu.fill(68, 34, 2, 2, " ")
-  gpu.fill(64, 34, 2, 1, " ")
-  gpu.fill(62, 32, 2, 1, " ")
-  gpu.fill(60, 33, 2, 1, " ")
-  gpu.fill(58, 31, 2, 1, " ")
-  gpu.fill(56, 29, 4, 1, " ")
-  gpu.fill(54, 27, 4, 1, " ")
-  gpu.fill(52, 25, 4, 1, " ")
-
-  gpu.fill(52, 21, 4, 1, " ")
-  gpu.fill(54, 19, 4, 1, " ")
-  gpu.fill(56, 17, 4, 1, " ")
-  gpu.fill(58, 15, 2, 1, " ")
-  gpu.fill(62, 14, 2, 1, " ")
-  gpu.fill(64, 12, 2, 1, " ")
-  gpu.fill(68, 11, 2, 2, " ")
-  gpu.fill(72, 10, 2, 2, " ")
-  gpu.fill(76, 9, 2, 2, " ")
-  
-  --chevrons
-  gpu.setBackground(palette.RED_DARK)
-
-  gpu.fill(78, 8, 6, 1, " ")
-  gpu.fill(79, 9, 1, 1, " ")
-  gpu.fill(82, 9, 1, 1, " ")
-  gpu.fill(80, 10, 2, 1, " ")
-  
-  gpu.fill(100, 12, 2, 1, " ")
-  gpu.fill(102, 13, 2, 1, " ")
-  gpu.fill(98, 13, 2, 2, " ")
-  gpu.fill(100, 14, 2, 1, " ")
-  
-  gpu.fill(106, 23, 2, 1, " ")
-  gpu.fill(108, 22, 2, 1, " ")
-  gpu.fill(108, 24, 2, 1, " ")
-  gpu.fill(110, 22, 2, 3, " ")
-
-  gpu.fill(102, 30, 4, 1, " ")
-  gpu.fill(102, 31, 2, 1, " ")
-  gpu.fill(106, 31, 2, 1, " ")
-  gpu.fill(104, 32, 2, 1, " ")
-
-  gpu.fill(90, 35, 2, 1, " ")
-  gpu.fill(89, 36, 1, 1, " ")
-  gpu.fill(92, 36, 1, 1, " ")
-  gpu.fill(88, 37, 6, 1, " ")
-  
-  gpu.fill(70, 35, 2, 1, " ")
-  gpu.fill(69, 36, 1, 1, " ")
-  gpu.fill(72, 36, 1, 1, " ")
-  gpu.fill(68, 37, 6, 1, " ")
-
-  gpu.fill(56, 30, 4, 1, " ")
-  gpu.fill(54, 31, 2, 1, " ")
-  gpu.fill(58, 31, 2, 1, " ")
-  gpu.fill(56, 32, 2, 1, " ")
-
-  gpu.fill(50, 22, 4, 1, " ")
-  gpu.fill(50, 23, 2, 1, " ")
-  gpu.fill(54, 23, 2, 1, " ")
-  gpu.fill(50, 24, 4, 1, " ")
-  
-  gpu.fill(60, 12, 2, 1, " ")
-  gpu.fill(58, 13, 2, 1, " ")
-  gpu.fill(62, 13, 2, 1, " ")
-  gpu.fill(60, 14, 4, 1, " ")
-end
-
-function graphics.drawGateControls()
-  --chevron lines
-  gpu.setBackground(palette.SLATE_LIGHT)
-
-  gpu.fill(102, 12, 18, 1, " ")
-  gpu.fill(119, 11, 1, 1, " ")
-  gpu.fill(119, 10, 17, 1, " ")
-
-  gpu.fill(112, 23, 10, 1, " ")
-  gpu.fill(121, 17, 1, 6, " ")
-  gpu.fill(121, 16, 18, 1, " ")
-  
-  gpu.fill(106, 32, 17, 1, " ")
-  gpu.fill(123, 23, 1, 10, " ")
-  gpu.fill(123, 22, 19, 1, " ")
-  
-  gpu.fill(144, 46, 3, 1, " ")
-  gpu.fill(146, 6, 1, 40, " ")
-  gpu.fill(80, 6, 67, 1, " ")
-  gpu.fill(80, 6, 2, 2, " ")
-  
-  gpu.fill(144, 40, 5, 1, " ")
-  gpu.fill(148, 5, 1, 35, " ")
-  gpu.fill(54, 5, 95, 1, " ")
-  gpu.fill(54, 5, 1, 8, " ")
-  gpu.fill(54, 12, 6, 1, " ")
-  
-  gpu.fill(144, 34, 7, 1, " ")
-  gpu.fill(150, 4, 1, 30, " ")
-  gpu.fill(44, 23, 6, 1, " ")
-  gpu.fill(44, 4, 1, 20, " ")
-  gpu.fill(44, 4, 107, 1, " ")
-  
-  gpu.fill(144, 28, 9, 1, " ")
-  gpu.fill(152, 3, 1, 25, " ")
-  gpu.fill(40, 32, 16, 1, " ")
-  gpu.fill(40, 3, 1, 29, " ")
-  gpu.fill(40, 3, 112, 1, " ")
-  
-  --address windows
-  gpu.setBackground(palette.SLATE_LIGHT)
-  gpu.setForeground(palette.TEXT_WHITE)
-  for number = 1, 9 do
-    local y = 7 + (number - 1) * 5
-    gpu.setBackground(palette.SLATE_LIGHT)
-    gpu.fill(130, y, 14, 3, " ")
-    gpu.setBackground(palette.BACKGROUND)
-    gpu.fill(131, y + 1, 12, 1, " ")
-    gpu.set(129, y + 1, tostring(number))
-  end
-end
-
-function graphics.fillGate(color)
+local function fill(x, y, width, height, color)
   gpu.setBackground(color)
-  gpu.fill(74, 12, 14, 1, " ")
-  gpu.fill(70, 13, 22, 1, " ")
-  gpu.fill(66, 14, 30, 1, " ")
-  gpu.fill(64, 15, 34, 1, " ")
-  gpu.fill(62, 16, 38, 2, " ")
-  gpu.fill(60, 18, 42, 2, " ")
-  gpu.fill(58, 20, 46, 7, " ")
-  gpu.fill(60, 27, 42, 2, " ")
-  gpu.fill(62, 29, 38, 2, " ")
-  gpu.fill(64, 31, 34, 1, " ")
-  gpu.fill(66, 32, 30, 1, " ")
-  gpu.fill(70, 33, 22, 1, " ")
-  gpu.fill(74, 34, 14, 1, " ")
-  
-  if color == palette.BACKGROUND then
-    -- cross in the middle of gate graphic
-    gpu.setBackground(palette.GREY_DARK)
-    gpu.fill(80, 22, 2, 3, " ")
-    gpu.fill(78, 23, 6, 1, " ")
+  gpu.fill(x, y, width, height, " ")
+end
+
+local function text(x, y, value, foreground, background)
+  gpu.setBackground(background)
+  gpu.setForeground(foreground)
+  gpu.set(x, y, value)
+end
+
+local function centered(x, y, width, value, foreground, background)
+  text(x + math.floor((width - unicode.len(value)) / 2), y, value, foreground, background)
+end
+
+local function panel(x, y, width, height, title)
+  fill(x, y, width, height, palette.PANEL)
+  fill(x, y, width, 1, palette.BORDER)
+  text(x + 2, y + 1, title, palette.CYAN_LIGHT, palette.PANEL)
+end
+
+local centerX, centerY = 79, 23
+
+local function ellipse(rx, ry, color)
+  gpu.setBackground(color)
+  for dy = -ry, ry do
+    local dx = math.floor(rx * math.sqrt(1 - (dy / ry)^2))
+    gpu.fill(centerX - dx, centerY + dy, 2 * dx + 1, 1, " ")
   end
 end
 
-function graphics.drawIris()
-  graphics.fillGate(palette.BLUE_DARK)
-  gpu.setBackground(palette.BLUE_LIGHT)
-  gpu.fill(80, 12, 2, 23, " ")
-  gpu.fill(58, 23, 46, 1, " ")
-  
-  gpu.fill(82, 21, 2, 1, " ")
-  gpu.fill(84, 20, 2, 1, " ")
-  gpu.fill(86, 18, 2, 2, " ")
-  gpu.fill(88, 16, 2, 2, " ")
-  gpu.fill(90, 14, 2, 2, " ")
-  
-  gpu.fill(84, 22, 2, 1, " ")
-  gpu.fill(86, 21, 2, 1, " ")
-  gpu.fill(88, 20, 4, 1, " ")
-  gpu.fill(92, 19, 4, 1, " ")
-  gpu.fill(96, 18, 4, 1, " ")
-  
-  gpu.fill(84, 24, 2, 1, " ")
-  gpu.fill(86, 25, 2, 1, " ")
-  gpu.fill(88, 26, 4, 1, " ")
-  gpu.fill(92, 27, 4, 1, " ")
-  gpu.fill(96, 28, 4, 1, " ")
-  
-  gpu.fill(82, 25, 2, 1, " ")
-  gpu.fill(84, 26, 2, 1, " ")
-  gpu.fill(86, 27, 2, 2, " ")
-  gpu.fill(88, 29, 2, 2, " ")
-  gpu.fill(90, 31, 2, 2, " ")
-
-  gpu.fill(78, 25, 2, 1, " ")
-  gpu.fill(76, 26, 2, 1, " ")
-  gpu.fill(74, 27, 2, 2, " ")
-  gpu.fill(72, 29, 2, 2, " ")
-  gpu.fill(70, 31, 2, 2, " ")
-  
-  gpu.fill(76, 24, 2, 1, " ")
-  gpu.fill(74, 25, 2, 1, " ")
-  gpu.fill(70, 26, 4, 1, " ")
-  gpu.fill(66, 27, 4, 1, " ")
-  gpu.fill(62, 28, 4, 1, " ")
-
-  gpu.fill(76, 22, 2, 1, " ")
-  gpu.fill(74, 21, 2, 1, " ")
-  gpu.fill(70, 20, 4, 1, " ")
-  gpu.fill(66, 19, 4, 1, " ")
-  gpu.fill(62, 18, 4, 1, " ")
-
-  gpu.fill(78, 21, 2, 1, " ")
-  gpu.fill(76, 20, 2, 1, " ")
-  gpu.fill(74, 18, 2, 2, " ")
-  gpu.fill(72, 16, 2, 2, " ")
-  gpu.fill(70, 14, 2, 2, " ")
+local function drawRing()
+  ellipse(31, 15, 0x213750)
+  ellipse(30, 14, 0x376B88)
+  ellipse(28, 13, 0x1A3550)
+  ellipse(26, 12, 0x72BDCF)
+  ellipse(23, 11, palette.INSET)
 end
 
-local chevrons = {
-  {100, 13}, {108, 23}, {104, 31}, {56, 31}, {52, 23},
-  {60, 13}, {80, 9}, {90, 36}, {70, 36}
+-- Positions follow the SGCraft seven-chevron sequence, with two extra lower slots.
+local ringChevrons = {
+  {98, 13}, {107, 23}, {98, 33}, {60, 33}, {51, 23},
+  {60, 13}, {79, 9}, {89, 36}, {69, 36}
 }
 
-function graphics.drawChevron(number, symbol, color)
-  local position = chevrons[number]
-  if not position then return end
-  gpu.setBackground(color)
-  gpu.fill(position[1], position[2], 2, 1, " ")
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.setForeground(palette.TEXT_WHITE)
-  gpu.set(136, 8 + (number - 1) * 5, symbol)
+function graphics.drawChevron(number, symbol, active)
+  local ring = ringChevrons[number]
+  local x = 124 + (number - 1) % 3 * 9
+  local y = 29 + math.floor((number - 1) / 3) * 5
+  local color = active and palette.AMBER or palette.BORDER
+  fill(ring[1] - 1, ring[2], 3, 1, color)
+  fill(x, y, 7, 3, palette.INSET)
+  text(x + 1, y, tostring(number), palette.GREY_LIGHT, palette.INSET)
+  centered(x, y + 1, 7, active and symbol or "-", color, palette.INSET)
 end
 
-local function drawHorizonLayer(radiusX, radiusY, color)
-  gpu.setBackground(color)
-  for dy = -radiusY, radiusY do
-    local halfWidth = math.floor(radiusX * math.sqrt(1 - (dy / radiusY)^2))
-    gpu.fill(81 - halfWidth, 23 + dy, 2 * halfWidth + 1, 1, " ")
-  end
-end
+function graphics.draw()
+  local width, height = gpu.getResolution()
+  fill(1, 1, width, height, palette.BACKGROUND)
+  fill(1, 1, width, 3, palette.PANEL)
+  fill(1, 4, width, 1, palette.BORDER)
+  text(4, 2, "УПРАВЛЕНИЕ ЗВЁЗДНЫМИ ВРАТАМИ", palette.TEXT_WHITE, palette.PANEL)
 
-function graphics.drawWormhole()
-  graphics.fillGate(palette.BLUE)
-  drawHorizonLayer(19, 9, 0x277EA5)
-  drawHorizonLayer(14, 7, 0x309ABC)
-  drawHorizonLayer(8, 4, 0x55BBD2)
+  panel(3, 6, 36, 15, "УПРАВЛЕНИЕ")
+  panel(3, 23, 36, 9, "НАЗНАЧЕНИЕ")
+  panel(3, 34, 36, 15, "ВЫБРАННЫЕ ВРАТА")
+  panel(41, 6, 77, 43, "СОСТОЯНИЕ ПОРТАЛА")
+  panel(121, 6, 31, 17, "МАРШРУТ")
+  panel(121, 25, 31, 24, "ШЕВРОНЫ")
+
+  drawRing()
+  for number = 1, 9 do graphics.drawChevron(number, " ", false) end
 end
 
 function graphics.emptyGate()
-  graphics.fillGate(palette.BACKGROUND)
+  ellipse(23, 11, palette.INSET)
+  fill(centerX - 3, centerY, 7, 1, 0x1E3650)
+  fill(centerX, centerY - 1, 1, 3, 0x1E3650)
 end
 
-function graphics.drawStatusWindow()
-  gpu.setBackground(palette.CYAN)
-  gpu.fill(40, 40, 80, 9, " ")
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.fill(40, 42, 80, 5, " ")
-  gpu.fill(41, 41, 78, 1, " ")
-  gpu.fill(41, 47, 78, 1, " ")
+function graphics.drawIris()
+  ellipse(23, 11, 0x314B68)
+  ellipse(18, 9, 0x466480)
+  ellipse(12, 6, 0x567591)
+  ellipse(5, 3, 0x314B68)
+  centered(66, centerY, 27, "ДИАФРАГМА ЗАКРЫТА", palette.TEXT_WHITE, 0x314B68)
+end
+
+function graphics.drawWormhole()
+  ellipse(23, 11, 0x16446C)
+  ellipse(20, 9, 0x205F91)
+  ellipse(16, 7, 0x2683AA)
+  ellipse(11, 5, 0x37A5BD)
+  ellipse(6, 3, 0x72CAD2)
+end
+
+local states = {
+  Offline = "НЕДОСТУПНЫ", Idle = "ОЖИДАНИЕ", Dialling = "НАБОР АДРЕСА",
+  Opening = "ОТКРЫТИЕ", Connected = "СОЕДИНЕНО", Closing = "ЗАКРЫТИЕ"
+}
+local irises = {
+  Offline = "НЕТ", Open = "ОТКРЫТА", Closed = "ЗАКРЫТА",
+  Opening = "ОТКРЫВАЕТСЯ", Closing = "ЗАКРЫВАЕТСЯ"
+}
+local directions = {Incoming = "ВХОДЯЩЕЕ", Outgoing = "ИСХОДЯЩЕЕ"}
+
+function graphics.stateLabel(state)
+  return states[state] or "НЕИЗВЕСТНО"
+end
+
+function graphics.irisLabel(state)
+  return irises[state] or "НЕИЗВЕСТНО"
 end
 
 function graphics.drawStateMsg(state, direction)
-  -- clear previous message
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.fill(40, 42, 80, 5, " ")
-  gpu.fill(41, 41, 78, 1, " ")
-  gpu.fill(41, 47, 78, 1, " ")
-  
-  -- write message
-  gpu.setBackground(palette.RED)
-  if state == "Offline" then
-    graphics.drawO(10)
-    graphics.drawF(10+8)
-    graphics.drawF(10+16)
-    graphics.drawL(10+24)
-    graphics.drawI(10+32)
-    graphics.drawN(10+40)
-    graphics.drawE(10+48)
-  elseif state == "Idle" then
-    graphics.drawI(23)
-    graphics.drawD(23+8)
-    graphics.drawL(23+16)
-    graphics.drawE(23+24)
-  elseif state == "Dialling" then
-    graphics.drawD(5)
-    graphics.drawI(5+8)
-    graphics.drawA(5+16)
-    graphics.drawL(5+24)
-    graphics.drawL(5+32)
-    graphics.drawI(5+40)
-    graphics.drawN(5+48)
-    graphics.drawG(5+56)
-  elseif state == "Opening" then
-    graphics.drawO(10)
-    graphics.drawP(10+8)
-    graphics.drawE(10+16)
-    graphics.drawN(10+24)
-    graphics.drawI(10+32)
-    graphics.drawN(10+40)
-    graphics.drawG(10+48)
-  elseif state == "Connected" and direction == "Incoming" then
-    graphics.drawI(4)
-    graphics.drawN(4+8)
-    graphics.drawC(4+16)
-    graphics.drawO(4+24)
-    graphics.drawM(4+32+1)
-    graphics.drawI(4+40+2)
-    graphics.drawN(4+48+2)
-    graphics.drawG(4+56+2)
-  elseif state == "Connected" and direction == "Outgoing" then
-    graphics.drawC(2)
-    graphics.drawO(2+8)
-    graphics.drawN(2+16)
-    graphics.drawN(2+24)
-    graphics.drawE(2+32)
-    graphics.drawC(2+40)
-    graphics.drawT(2+48)
-    graphics.drawE(2+56)
-    graphics.drawD(2+64)
-  elseif state == "Closing" then
-    graphics.drawC(10)
-    graphics.drawL(10+8)
-    graphics.drawO(10+16)
-    graphics.drawS(10+24)
-    graphics.drawI(10+32)
-    graphics.drawN(10+40)
-    graphics.drawG(10+48)
+  local color = palette.CYAN_LIGHT
+  if state == "Connected" then
+    color = palette.GREEN
+  elseif state == "Offline" then
+    color = palette.RED_BRIGHT
+  elseif state ~= "Idle" then
+    color = palette.AMBER
   end
+  fill(45, 40, 69, 1, palette.BORDER)
+  fill(45, 41, 69, 6, palette.INSET)
+  centered(45, 43, 69, graphics.stateLabel(state), color, palette.INSET)
+  if directions[direction] then
+    centered(45, 45, 69, directions[direction], palette.GREY_LIGHT, palette.INSET)
+  end
+end
+
+local function wrap(value, width, lines)
+  local result = {}
+  while unicode.len(value) > width and #result < lines - 1 do
+    local line = unicode.sub(value, 1, width + 1):match("^(.*) ")
+    local length = line and line ~= "" and unicode.len(line) or width
+    result[#result + 1] = unicode.sub(value, 1, length)
+    value = unicode.sub(value, length + 1):gsub("^ +", "")
+  end
+  result[#result + 1] = unicode.sub(value, 1, width)
+  return result
 end
 
 function graphics.drawRoute(label, status, ready)
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.setForeground(palette.CYAN_LIGHT)
-  gpu.fill(4, 45, 34, 1, " ")
-  gpu.set(4, 45, label:sub(1, 34))
-  gpu.setForeground(ready and palette.GREEN or palette.TEXT_WHITE)
-  gpu.fill(4, 49, 34, 1, " ")
-  gpu.set(4, 49, status:sub(1, 34))
+  fill(123, 9, 27, 5, palette.PANEL)
+  text(124, 9, unicode.sub(label, 1, 26), palette.TEXT_WHITE, palette.PANEL)
+  for row, line in ipairs(wrap(status, 26, 2)) do
+    text(124, 10 + row, line, ready and palette.GREEN or palette.GREY_LIGHT, palette.PANEL)
+  end
 end
 
-function graphics.drawRemoteInfo(x, y, address, energy)
-  gpu.setBackground(palette.CYAN)
-  gpu.fill(x, y, 34, 9, " ")
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.fill(x+1, y+3, 32, 5, " ")
-  gpu.setBackground(palette.CYAN)
-  gpu.setForeground(palette.TEXT_WHITE)
-  gpu.set(x + math.floor((34 - #"REMOTE GATE DATA") / 2), y+1, "REMOTE GATE DATA")
-  gpu.setBackground(palette.BACKGROUND)
-  if address == nil or string.len(address) < 7 then
-    gpu.set(x+2, y+4, "ADDRESS: INVALID")
-  else
-    gpu.set(x+2, y+4, "ADDRESS: " .. address)
-  end
-  
-  if type(energy) ~= "number" then
-    gpu.set(x+2, y+6, "ENERGY TO DIAL: N/A")
-  else
-    gpu.set(x+2, y+6, "ENERGY TO DIAL: " .. math.floor(energy + 0.5))
-  end
-  
+local function readout(y, label, value)
+  fill(5, y, 32, 1, palette.INSET)
+  text(6, y, label, palette.GREY_LIGHT, palette.INSET)
+  local shown = unicode.sub(tostring(value), 1, 18)
+  text(36 - unicode.len(shown), y, shown, palette.TEXT_WHITE, palette.INSET)
 end
 
-function graphics.drawLocalGateInfo(x, y, address, energy, iris, err)
-  gpu.setBackground(palette.CYAN)
-  gpu.fill(x, y, 34, 11+7, " ")
-  gpu.setBackground(palette.BACKGROUND)
-  gpu.fill(x+1, y+3, 32, 7+7, " ")
-  gpu.setBackground(palette.CYAN)
-  gpu.setForeground(palette.TEXT_WHITE)
-  gpu.set(x + math.floor((34 - #"LOCAL GATE DATA") / 2), y+1, "LOCAL GATE DATA")
-  gpu.setBackground(palette.BACKGROUND)
-  
-  if not address or address == "" then
-    gpu.set(x+2, y+4, "ADDRESS: UNKNOWN")
-  else
-    gpu.set(x+2, y+4, "ADDRESS: " .. address)
-  end
-  
-  if type(energy) ~= "number" then
-    gpu.set(x+2, y+6, "AVAILABLE ENERGY: N/A")
-  else
-    gpu.set(x+2, y+6, "AVAILABLE ENERGY: " .. math.floor(energy + 0.5))
-  end
-  
-  if iris == nil then
-    gpu.set(x+2, y+8, "IRIS STATE: UNKNOWN")
-  else
-    gpu.set(x+2, y+8, "IRIS STATE: " .. iris)
-  end
-  
-  gpu.set(x+2, y+10, "LAST DIALLING ERROR:")
-  gpu.fill(x+2, y+11, 31, 5, " ")
-  if err == nil then
-    gpu.setForeground(palette.GREEN)
-    gpu.set(x+2, y+12, "None")
-  else
-    gpu.setForeground(palette.RED_DARK)
-    err = tostring(err):gsub("%c", " ")
-    for row = 0, 3 do
-      local start = row * 30 + 1
-      gpu.set(x + 2, y + 12 + row, err:sub(start, start + 29))
+local function energyValue(energy)
+  return type(energy) == "number" and math.floor(energy + 0.5) or "—"
+end
+
+function graphics.drawRemoteInfo(address, energy)
+  readout(27, "АДРЕС", address ~= "" and address or "-")
+  readout(29, "ЦЕНА НАБОРА", energyValue(energy))
+end
+
+function graphics.drawLocalGateInfo(address, energy, iris, err)
+  readout(38, "АДРЕС", address and address ~= "" and address or "-")
+  readout(40, "ЭНЕРГИЯ", energyValue(energy))
+  readout(42, "ДИАФРАГМА", graphics.irisLabel(iris))
+  fill(5, 44, 32, 4, palette.PANEL)
+  if err then
+    for row, line in ipairs(wrap(tostring(err):gsub("%c", " "), 30, 3)) do
+      text(6, 43 + row, line, palette.AMBER, palette.PANEL)
     end
-    
   end
-end
-
-function graphics.drawA(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 44, 6, 1, " ")
-  gpu.fill(47+offset, 42, 2, 5, " ")
-end
-
-function graphics.drawC(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 46, 6, 1, " ")
-end
-
-function graphics.drawD(offset)
-  gpu.fill(43+offset, 42, 4, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 46, 4, 1, " ")
-  gpu.fill(47+offset, 43, 2, 3, " ")
-end
-
-function graphics.drawE(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 44, 4, 1, " ")
-  gpu.fill(43+offset, 46, 6, 1, " ")
-end
-
-function graphics.drawF(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 44, 4, 1, " ")
-end
-
-function graphics.drawG(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 46, 6, 1, " ")
-  gpu.fill(47+offset, 42, 2, 2, " ")
-  gpu.fill(46+offset, 45, 3, 2, " ")
-end
-
-function graphics.drawI(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(45+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 46, 6, 1, " ")
-end
-
-function graphics.drawL(offset)
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 46, 6, 1, " ")
-end
-
-function graphics.drawM(offset)
-  gpu.fill(43+offset, 42, 2, 1, " ")
-  gpu.fill(42+offset, 42, 2, 5, " ")
-  gpu.fill(47+offset, 42, 2, 1, " ")
-  gpu.fill(48+offset, 42, 2, 5, " ")
-  gpu.fill(45+offset, 43, 2, 1, " ")
-end
-
-function graphics.drawN(offset)
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(47+offset, 42, 2, 5, " ")
-  gpu.fill(45+offset, 43, 1, 1, " ")
-  gpu.fill(45+offset, 44, 2, 1, " ")
-  gpu.fill(46+offset, 45, 1, 1, " ")
-end
-
-function graphics.drawO(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 46, 6, 1, " ")
-  gpu.fill(47+offset, 42, 2, 5, " ")
-end
-
-function graphics.drawP(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 5, " ")
-  gpu.fill(43+offset, 44, 6, 1, " ")
-  gpu.fill(47+offset, 42, 2, 3, " ")
-end
-
-function graphics.drawS(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(43+offset, 42, 2, 3, " ")
-  gpu.fill(43+offset, 44, 6, 1, " ")
-  gpu.fill(47+offset, 44, 2, 3, " ")
-  gpu.fill(43+offset, 46, 6, 1, " ")
-end
-
-function graphics.drawT(offset)
-  gpu.fill(43+offset, 42, 6, 1, " ")
-  gpu.fill(45+offset, 42, 2, 5, " ")
 end
 
 return graphics

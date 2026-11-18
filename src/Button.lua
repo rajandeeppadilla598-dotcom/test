@@ -1,4 +1,5 @@
 local component = require("component")
+local unicode = require("unicode")
 local palette = require("src/palette")
 local classes = require("src/classes")
 
@@ -27,7 +28,7 @@ function Button:draw()
   end
   
   gpu.fill(self.x, self.y, self.w, self.h, " ")
-  gpu.set(self.x + math.floor((self.w - #self.label) / 2), self.y + math.floor(self.h / 2), self.label)
+  gpu.set(self.x + math.floor((self.w - unicode.len(self.label)) / 2), self.y + math.floor(self.h / 2), self.label)
 end
 
 function Button:update(label, bg, locked)
