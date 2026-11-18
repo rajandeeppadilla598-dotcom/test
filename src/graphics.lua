@@ -79,8 +79,11 @@ end
 
 function graphics.emptyGate()
   ellipse(23, 11, palette.INSET)
-  fill(centerX - 3, centerY, 7, 1, 0x1E3650)
-  fill(centerX, centerY - 1, 1, 3, 0x1E3650)
+  fill(centerX - 12, centerY, 8, 1, palette.BORDER)
+  fill(centerX + 5, centerY, 8, 1, palette.BORDER)
+  fill(centerX, centerY - 5, 1, 2, palette.BORDER)
+  fill(centerX, centerY + 4, 1, 2, palette.BORDER)
+  centered(74, centerY, 11, "SG", palette.GREY_LIGHT, palette.INSET)
 end
 
 function graphics.drawIris()
@@ -97,6 +100,9 @@ function graphics.drawWormhole()
   ellipse(16, 7, 0x2683AA)
   ellipse(11, 5, 0x37A5BD)
   ellipse(6, 3, 0x72CAD2)
+  fill(centerX - 13, centerY - 4, 8, 1, 0x63BECC)
+  fill(centerX + 4, centerY + 4, 9, 1, 0x63BECC)
+  fill(centerX - 7, centerY, 15, 1, 0xB4F1ED)
 end
 
 local states = {
@@ -117,7 +123,32 @@ function graphics.irisLabel(state)
   return irises[state] or "НЕИЗВЕСТНО"
 end
 
-function graphics.drawStateMsg(state, direction)
+-- Each hexadecimal digit describes one four-cell row of a five-row glyph.
+local statusGlyphs = {
+  ["А"] = "699F9", ["Б"] = "F8E9E", ["В"] = "E9E9E", ["Д"] = "66AF9",
+  ["Е"] = "F8E8F", ["Ж"] = "B6F6B", ["З"] = "E161E", ["И"] = "9BD99",
+  ["К"] = "9ACA9", ["М"] = "9FF99", ["Н"] = "99F99", ["О"] = "69996", ["П"] = "F9999",
+  ["Р"] = "E9E88", ["С"] = "78887", ["Т"] = "F6666", ["У"] = "9964C",
+  ["Ы"] = "99DD9", [" "] = "00000"
+}
+
+local function drawStatusTitle(label, color)
+  local left = 45 + math.floor((69 - (unicode.len(label) * 5 - 1)) / 2)
+  gpu.setBackground(color)
+  for index = 1, unicode.len(label) do
+    local glyph = statusGlyphs[unicode.sub(label, index, index)]
+    for row = 1, 5 do
+      local pixels = tonumber(glyph:sub(row, row), 16)
+      for column = 0, 3 do
+        if math.floor(pixels / 2^(3 - column)) % 2 == 1 then
+          gpu.fill(left + (index - 1) * 5 + column, 40 + row, 1, 1, " ")
+        end
+      end
+    end
+  end
+end
+
+function graphics.drawStateMsg(state)
   local color = palette.CYAN_LIGHT
   if state == "Connected" then
     color = palette.GREEN
@@ -126,11 +157,17 @@ function graphics.drawStateMsg(state, direction)
   elseif state ~= "Idle" then
     color = palette.AMBER
   end
-  fill(45, 40, 69, 1, palette.BORDER)
-  fill(45, 41, 69, 6, palette.INSET)
-  centered(45, 43, 69, graphics.stateLabel(state), color, palette.INSET)
-  if directions[direction] then
-    centered(45, 45, 69, directions[direction], palette.GREY_LIGHT, palette.INSET)
+  fill(45, 39, 69, 1, color)
+  fill(45, 40, 69, 9, palette.INSET)
+  drawStatusTitle(graphics.stateLabel(state), color)
+end
+
+function graphics.drawStateDetail(state, direction, engaged)
+  fill(45, 47, 69, 1, palette.INSET)
+  if state == "Dialling" or state == "Opening" then
+    centered(45, 47, 69, "ШЕВРОНОВ ЗАХВАЧЕНО: " .. engaged, palette.AMBER, palette.INSET)
+  elseif directions[direction] then
+    centered(45, 47, 69, directions[direction], palette.GREY_LIGHT, palette.INSET)
   end
 end
 
@@ -146,11 +183,12 @@ local function wrap(value, width, lines)
   return result
 end
 
-function graphics.drawRoute(label, status, ready)
-  fill(123, 9, 27, 5, palette.PANEL)
-  text(124, 9, unicode.sub(label, 1, 26), palette.TEXT_WHITE, palette.PANEL)
+function graphics.drawRoute(source, target, status, ready)
+  fill(123, 9, 27, 5, palette.INSET)
+  text(124, 9, "ОТКУДА  " .. source, palette.TEXT_WHITE, palette.INSET)
+  text(124, 10, "КУДА    " .. target, palette.CYAN_LIGHT, palette.INSET)
   for row, line in ipairs(wrap(status, 26, 2)) do
-    text(124, 10 + row, line, ready and palette.GREEN or palette.GREY_LIGHT, palette.PANEL)
+    text(124, 11 + row, line, ready and palette.GREEN or palette.GREY_LIGHT, palette.INSET)
   end
 end
 

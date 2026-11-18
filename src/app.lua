@@ -47,7 +47,8 @@ end
 
 local function updateGate(entry)
   local gate = entry.proxy
-  local state, _, direction = read(gate.stargateState)
+  local state, engaged, direction = read(gate.stargateState)
+  entry.engaged = type(engaged) == "number" and math.max(0, math.min(9, math.floor(engaged))) or 0
   entry.state, entry.direction = state or "Offline", direction
   entry.iris = read(gate.irisState)
   entry.localAddress = AddressField.normalize(read(gate.localAddress))
@@ -116,7 +117,7 @@ local function controlGate(gpu)
 
   local gates, byId = discoverGates({})
   local selected = 1
-  local shownGate, shownState, shownDirection, shownInterior
+  local shownGate, shownState, shownDirection, shownInterior, shownEngaged
   local shownRemote, shownLocal, shownRoute
   local shownChevrons = {}
 
@@ -128,13 +129,19 @@ local function controlGate(gpu)
     local state = entry and entry.state or "Offline"
     local direction = entry and entry.direction
     local irisState = entry and entry.iris
-    if entry ~= shownGate or state ~= shownState or direction ~= shownDirection then
-      graphics.drawStateMsg(state, direction)
-      shownGate, shownState, shownDirection = entry, state, direction
+    local engaged = entry and entry.engaged or 0
+    if state ~= shownState then graphics.drawStateMsg(state) end
+    if entry ~= shownGate or state ~= shownState or direction ~= shownDirection
+        or engaged ~= shownEngaged then
+      graphics.drawStateDetail(state, direction, engaged)
+      shownGate, shownState, shownDirection, shownEngaged = entry, state, direction, engaged
     end
 
     for number = 1, 9 do
       local symbol = entry and entry.chevrons[number]
+      if not symbol and state ~= "Idle" and state ~= "Offline" and number <= engaged then
+        symbol = "+"
+      end
       if symbol ~= shownChevrons[number] then
         graphics.drawChevron(number, symbol or " ", symbol ~= nil)
         shownChevrons[number] = symbol
@@ -170,11 +177,11 @@ local function controlGate(gpu)
       and not sameAddress(entry.localAddress, target.localAddress)
     linkGate:update("СОЕДИНИТЬ ВРАТА", palette.BLUE, not routePossible or state ~= "Idle")
     local route, ready = routeStatus(entry, target)
-    local routeLabel = target and string.format("ВРАТА %d > %d  %s", selected,
-      selected % #gates + 1, target.localAddress) or "ЛОКАЛЬНЫЙ МАРШРУТ"
-    local routeKey = routeLabel .. "|" .. route .. tostring(ready)
+    local sourceAddress = entry and entry.localAddress ~= "" and entry.localAddress or "—"
+    local targetAddress = target and target.localAddress ~= "" and target.localAddress or "—"
+    local routeKey = table.concat({sourceAddress, targetAddress, route, tostring(ready)}, "|")
     if shownRoute ~= routeKey then
-      graphics.drawRoute(routeLabel, route, ready)
+      graphics.drawRoute(sourceAddress, targetAddress, route, ready)
       shownRoute = routeKey
     end
 
